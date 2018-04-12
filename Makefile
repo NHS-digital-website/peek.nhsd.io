@@ -3,7 +3,7 @@ REGION ?= eu-west-1
 PWD ?= $(shell pwd)
 BUILD_DIR ?= out
 VENV ?= $(PWD)/.venv
-HIPPO_GIT ?= $(PWD)/../ps-hippo/.git
+HIPPO_GIT ?= $(PWD)/../hippo/.git
 
 PATH := $(VENV)/bin:$(shell printenv PATH)
 SHELL := env PATH=$(PATH) /bin/bash
@@ -22,20 +22,12 @@ help:
 		$(MAKEFILE_LIST)
 
 ## Builds
-build: $(BUILD_DIR) build.env-version
+build: $(BUILD_DIR)
 	mkdir $(BUILD_DIR)/js
 	cp -R src/main/js $(BUILD_DIR)
 	mkdir $(BUILD_DIR)/css
 	cp -R src/main/css $(BUILD_DIR)
 	cp -R src/main/html/* $(BUILD_DIR)
-
-build.env-version:
-	git --git-dir=$(HIPPO_GIT) tag --points-at tst \
-		| grep v2 | awk '{print "{ \"version\": \""$$1"\" }"}' > $(BUILD_DIR)/tst.json
-	git --git-dir=$(HIPPO_GIT) tag --points-at uat \
-		| grep v2 | awk '{print "{ \"version\": \""$$1"\" }"}' > $(BUILD_DIR)/uat.json
-	git --git-dir=$(HIPPO_GIT) tag --points-at prd \
-		| grep v2 | awk '{print "{ \"version\": \""$$1"\" }"}' > $(BUILD_DIR)/prd.json
 
 ## Deploy to S3 buckegt
 deploy: $(VENV)
